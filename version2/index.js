@@ -26,17 +26,17 @@ function filterUniqueNames(list, type) {
         case 'full':
             return [...new Set(list)];
             break;
-        case 'first':
-            const firstNameList = list.map(l => {
-                return l[0];
-            });
-            return [...new Set(firstNameList.sort())];
-            break;
         case 'last':
             const lastNameList = list.map(l => {
-                return l[1];
+                return l[0];
             });
             return [...new Set(lastNameList.sort())];
+            break;
+        case 'first':
+            const firstNameList = list.map(l => {
+                return l[1];
+            });
+            return [...new Set(firstNameList.sort())];
             break;
         default:
             return [];
@@ -63,7 +63,7 @@ function getTenNameList(list) {
 }
 
 function getTenCommonName(list, type) {
-    const getNumber = type === 'first' ? 0 : 1;
+    const getNumber = type === 'first' ? 1 : 0;
     const firstNameObjectList = {};
 
     const newList = list.map(name => {
@@ -94,13 +94,17 @@ function question1(fullNameList) {
     const uniqueFirstNameLength = filterUniqueNames(getSplitFullName(fullNameList), 'first').length;
     const uniqueLastNameLength = filterUniqueNames(getSplitFullName(fullNameList), 'last').length;
 
+    console.log('There are ' + uniqueFullNameLength + ' unique full names.\n');
     fs.writeFile(OUTPUT_FILE, 'There are ' + uniqueFullNameLength + ' unique full names.\n', (err, result) => {
         if (err) console.log(err);
     });
 
+    console.log('There are ' + uniqueFirstNameLength + ' unique first names.\n');
     fs.appendFile(OUTPUT_FILE, 'There are ' + uniqueFirstNameLength + ' unique first names.\n', err => {
         if (err) console.log(err);
     });
+
+    console.log('There are ' + uniqueLastNameLength + ' unique last names.\n');
     fs.appendFile(OUTPUT_FILE, 'There are ' + uniqueLastNameLength + ' unique last names.\n', err => {
         if (err) console.log(err);
     });
@@ -108,10 +112,12 @@ function question1(fullNameList) {
 
 function question2(splitFullNameList) {
     const getTenCommonFirstName = getTenCommonName(splitFullNameList, 'first');
+    console.log('The ten most common first names are:\n');
     fs.appendFile(OUTPUT_FILE, 'The ten most common first names are:\n', err => {
         if (err) console.log(err);
     });
     getTenCommonFirstName.forEach(firstName => {
+        console.log('\t ' + firstName[0] + ' (' + firstName[1] + ')\n');
         fs.appendFile(OUTPUT_FILE, '\t ' + firstName[0] + ' (' + firstName[1] + ')\n', err => {
             if (err) console.log(err);
         });
@@ -120,10 +126,12 @@ function question2(splitFullNameList) {
 
 async function question3(splitFullNameList) {
     const getTenCommonLastName = getTenCommonName(splitFullNameList, 'last');
+    console.log('The ten most common last names are:\n');
     fs.appendFile(OUTPUT_FILE, 'The ten most common last names are:\n', err => {
         if (err) console.log(err);
     });
     getTenCommonLastName.forEach(lastName => {
+        console.log('\t ' + lastName[0] + ' (' + lastName[1] + ')\n');
         fs.appendFile(OUTPUT_FILE, '\t ' + lastName[0] + ' (' + lastName[1] + ')\n', err => {
             if (err) console.log(err);
         });
@@ -131,7 +139,7 @@ async function question3(splitFullNameList) {
 }
 
 (async function() {
-    const filename = './test-data-10-exp-5.list';
+    const filename = './../test-data-10-exp-5.list';
     const fullNameList = await getFullNameList(filename);
 
     question1(fullNameList);
