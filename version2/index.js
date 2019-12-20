@@ -1,5 +1,6 @@
 const fs = require('fs');
 const readline = require('readline');
+const OUTPUT_FILE = 'output.txt';
 
 async function getFullNameList(filename) {
     let fullNameList = [];
@@ -82,19 +83,58 @@ function getTenCommonName(list, type) {
     return getTenNameList(sortList);
 }
 
+function getSplitFullName(fullNamelist) {
+    return fullNamelist.map(fullName => {
+        return fullName.split(',');
+    });
+}
+
+function question1(fullNameList) {
+    const uniqueFullNameLength = filterUniqueNames(fullNameList, 'full').length;
+    const uniqueFirstNameLength = filterUniqueNames(getSplitFullName(fullNameList), 'first').length;
+    const uniqueLastNameLength = filterUniqueNames(getSplitFullName(fullNameList), 'last').length;
+
+    fs.writeFile(OUTPUT_FILE, 'There are ' + uniqueFullNameLength + ' unique full names.\n', (err, result) => {
+        if (err) console.log(err);
+    });
+
+    fs.appendFile(OUTPUT_FILE, 'There are ' + uniqueFirstNameLength + ' unique first names.\n', err => {
+        if (err) console.log(err);
+    });
+    fs.appendFile(OUTPUT_FILE, 'There are ' + uniqueLastNameLength + ' unique last names.\n', err => {
+        if (err) console.log(err);
+    });
+}
+
+function question2(splitFullNameList) {
+    const getTenCommonFirstName = getTenCommonName(splitFullNameList, 'first');
+    fs.appendFile(OUTPUT_FILE, 'The ten most common first names are:\n', err => {
+        if (err) console.log(err);
+    });
+    getTenCommonFirstName.forEach(firstName => {
+        fs.appendFile(OUTPUT_FILE, '\t ' + firstName[0] + ' (' + firstName[1] + ')\n', err => {
+            if (err) console.log(err);
+        });
+    });
+}
+
+async function question3(splitFullNameList) {
+    const getTenCommonLastName = getTenCommonName(splitFullNameList, 'last');
+    fs.appendFile(OUTPUT_FILE, 'The ten most common last names are:\n', err => {
+        if (err) console.log(err);
+    });
+    getTenCommonLastName.forEach(lastName => {
+        fs.appendFile(OUTPUT_FILE, '\t ' + lastName[0] + ' (' + lastName[1] + ')\n', err => {
+            if (err) console.log(err);
+        });
+    });
+}
+
 (async function() {
     const filename = './test-data-10-exp-5.list';
     const fullNameList = await getFullNameList(filename);
 
-    const uniqueFullNameLength = filterUniqueNames(fullNameList, 'full').length;
-
-    const splitFullNameList = fullNameList.map(fullName => {
-        return fullName.split(',');
-    });
-
-    const uniqueFirstNameLength = filterUniqueNames(splitFullNameList, 'first').length;
-    const uniqueLastNameLength = filterUniqueNames(splitFullNameList, 'last').length;
-
-    const getTenCommonFirstName = getTenCommonName(splitFullNameList, 'first');
-    const getTenCommonLastName = getTenCommonName(splitFullNameList, 'last');
+    question1(fullNameList);
+    question2(getSplitFullName(fullNameList));
+    question3(getSplitFullName(fullNameList));
 })();
